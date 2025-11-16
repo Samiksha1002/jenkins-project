@@ -23,10 +23,10 @@ kind: Service
 metadata:
   name: restapi-service
 spec:
-  type: NodePort
+  type: LoadBalancer
   selector:
     app: restapi
   ports:
   - port: 7000
     targetPort: 7000
-    nodePort: 30007
+    
