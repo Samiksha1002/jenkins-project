@@ -27,7 +27,8 @@ stages{
            sh """
            echo "Checkout done - $PWD"
            echo "DEPLOY_ENV value $DEPLOY_ENV"
-           ls -l
+           ls -lecho "Running ${env.BUILD_ID} on ${env.JENKINS_URL}from ${"env.NODE_NAME"}
+           
            """
       }
    } 
@@ -66,7 +67,8 @@ stages{
    steps {
           sh """
            echo "========Building the Docker Image ============"
-           docker build -t $IMAGE_NAME:$APP_VERSION .
+           echo "Image name is - ${IMAGE_NAME}"
+           docker build -t $IMAGE_NAME:"${env.BUILD_NUMBER}" .
            echo "====== Building Image Completed ====="
          """      
    } 
