@@ -4,7 +4,7 @@ pipeline {
 environment {
    IMAGE_NAME = 'sam1002/springrestapi'
    PORT_MAPPING = '8081:7000'
-   DOCKERCREDENTIALS = credentials("dockerhub")
+   DOCKERCREDENTIALS = credentials("dockerhub") [DOCKERCREDENTIALS_USR , DOCKERCREDENTIALS_PSW]
 }
  
 parameters {
@@ -80,6 +80,7 @@ stages{
       sh """
            echo "======== Login the Docker Hub ============"
             echo "Docker credentials - ${DOCKERCREDENTIALS}"
+            docker login -u $DOCKERCREDENTIALS_USR --passwrod DOCKERCREDENTIALS_PSW
            echo "====== Login successful====="
          """      
    } 
