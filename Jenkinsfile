@@ -12,6 +12,7 @@ stage("checkout"){
                      return params.DEPLOY_ENV == 'devlopment' 
                 }
           }
+}
      steps {
            sh """
            echo "Checkout done - $PWD"
