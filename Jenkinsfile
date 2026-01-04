@@ -1,59 +1,47 @@
 pipeline {
  agent any
 
- environment {
-        IMAGE_NAME = 'sam1002/springrestxapi'
-        PORT_MAPPING = '8081:7000'  // hostPort:containerPort
-    }
-
+environment {
+   IMAGE_NAME = 'sam1002/springrestapi'
+   PORT_MAPPING = '8081:7000'
+   DOCKERCREDENTIALS = credentials("dockerhub")
+}
  
- 
-  parameters {
+parameters {
    string(name: 'DEPLOY_ENV', defaultValue: 'development', description: 'Select the target environment')
-   //string(name: 'APP_VERSION', description: 'Provide tag for the docker image')
+   // string(name: 'APP_VERSION', description: 'Provide tag for the docker image')
 }
 
 stages{
 
-  
-   stage("checkout"){
-    when {
+ stage("checkout"){
+  when {
                 // Execute this stage if the ENVIRONMENT parameter is 'development'
                 expression { 
                      return params.DEPLOY_ENV == 'development' 
                 }
           }
      steps {
-           sh """"
+           sh """
            echo "Checkout done - $PWD"
-           echo "DEPLOY_ENV value $DEPLOY_ENV"
-           ls -l 
-          echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}from "${env.NODE_NAME}"
-           
-           """"
+           echo "DEPOLYMENT ENV SELECTED - $DEPLOY_ENV"
+           ls -l
+           echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL} from ${env.NODE_NAME}"
+           """
       }
-   } 
+   }
 
-   stage("Check Tools") {
-            steps {
-                sh '''
-                  echo "PATH = $PATH"
-                  which mvn
-                  mvn --version
-                  java -version
-                '''
-            }
-        }
-       
-    stage("Building the application"){
+ 
+     stage("Building the application"){
      steps {
-         sh """
-           echo "========Building Java Application============"
-           mvn clean package -B -DskipTests
-           echo "======Building Java Application completed====="
-         """      
+         
+        sh 'echo "========Building Java Application============"'
+        sh '/opt/apache-maven-3.9.12/bin/mvn -v'
+        sh '/opt/apache-maven-3.9.12/bin/mvn clean package -B -DskipTests'
+        sh 'echo "======Building Java Application completed====="'
+    
       }
-    }
+   }
 
    stage("Testing the application"){
      steps {
@@ -61,21 +49,44 @@ stages{
          sh  '/opt/apache-maven-3.9.12/bin/mvn test'
           sh 'echo "========Completed Tests============"'
      }  
-   }
+   } 
+
 
  stage("Docker Image")
  {
    steps {
           sh """
            echo "========Building the Docker Image ============"
-           echo "Image name is - ${IMAGE_NAME}"
+           echo "IMAGE Name is - ${IMAGE_NAME}"
            docker build -t $IMAGE_NAME:"${env.BUILD_NUMBER}" .
            echo "====== Building Image Completed ====="
          """      
    } 
  }
 
+ stage("Scan the Image"){
+  steps {
+    sh """
+       echo "=====Scanning Image Started======"
+       trivy image $IMAGE_NAME:"${env.BUILD_NUMBER}"
+       echo "=====Scanning Completed========"
+       """
+  }
+ }
 
+ stage("Docker Login")
+ {
+   steps{
+      sh """
+           echo "======== Login the Docker Hub ============"
+            echo "Docker credentials - ${DOCKERCREDENTIALS}"
+           echo "====== Login successful====="
+         """      
+   } 
+ }
+
+ 
+           
 } // end of stages
 
 } // end of pipeline
