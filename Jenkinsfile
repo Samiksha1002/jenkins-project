@@ -5,12 +5,17 @@ pipeline {
    string(name: 'DEPLOY_ENV', defaultValue: 'devlopment', description: 'Select the target environment')
 }
 
-stages{
-    stage("checkout"){
+stage("checkout"){
+  when {
+                // Execute this stage if the ENVIRONMENT parameter is 'development'
+                expression { 
+                     return params.DEPLOY_ENV == 'development' 
+                }
+          }
      steps {
            sh """
            echo "Checkout done - $PWD"
-           echo " Deployment env selected is: $DEPLOY_ENV"
+           echo "DEPOLYMENT ENV SELECTED - $DEPLOY_ENV"
            ls -l
            """
       }
