@@ -10,7 +10,7 @@ pipeline {
  
   parameters {
    string(name: 'DEPLOY_ENV', defaultValue: 'development', description: 'Select the target environment')
-   string(name: 'APP_VERSION', description: 'Provide tag for the docker image')
+   //string(name: 'APP_VERSION', description: 'Provide tag for the docker image')
 }
 
 stages{
@@ -24,12 +24,13 @@ stages{
                 }
           }
      steps {
-           sh """
+           sh """"
            echo "Checkout done - $PWD"
            echo "DEPLOY_ENV value $DEPLOY_ENV"
-           ls -lecho "Running ${env.BUILD_ID} on ${env.JENKINS_URL}from ${"env.NODE_NAME"}
+           ls -l 
+          echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}from "${env.NODE_NAME}"
            
-           """
+           """"
       }
    } 
 
