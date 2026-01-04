@@ -2,7 +2,7 @@ pipeline {
  agent any
 
  parameters {
-   string(name: 'DEPLOY_ENV', defaultValue: 'devlopment', description: 'Select the target environment')
+   string(name: 'DEPLOY_ENV', defaultValue: 'development', description: 'Select the target environment')
 }
 
 stage("checkout"){
