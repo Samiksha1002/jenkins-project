@@ -2,14 +2,14 @@ pipeline {
  agent any
 
  parameters {
-   string(name: 'DEPLOY_ENV', defaultValue: 'development', description: 'Select the target environment')
+   string(name: 'DEPLOY_ENV', defaultValue: 'devlopment', description: 'Select the target environment')
 }
 
 stage("checkout"){
   when {
                 // Execute this stage if the ENVIRONMENT parameter is 'development'
                 expression { 
-                     return params.DEPLOY_ENV == 'development' 
+                     return params.DEPLOY_ENV == 'devlopment' 
                 }
           }
      steps {
