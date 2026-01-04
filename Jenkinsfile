@@ -4,7 +4,7 @@ pipeline {
 environment {
    IMAGE_NAME = 'sam1002/springrestapi'
    PORT_MAPPING = '8081:7000'
-   DOCKERCREDENTIALS = credentials("dockerhub") [DOCKERCREDENTIALS_USR , DOCKERCREDENTIALS_PSW]
+   DOCKERCREDENTIALS = credentials("dockerhub") //[DOCKERCREDENTIALS_USR , DOCKERCREDENTIALS_PSW]
 }
  
 parameters {
@@ -68,7 +68,7 @@ stages{
   steps {
     sh """
        echo "=====Scanning Image Started======"
-       // trivy image $IMAGE_NAME:"${env.BUILD_NUMBER}"
+        trivy image $IMAGE_NAME:"${env.BUILD_NUMBER}"
        echo "=====Scanning Completed========"
        """
   }
