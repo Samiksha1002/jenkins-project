@@ -1,40 +1,76 @@
 pipeline {
  agent any
 
- parameters {
-   string(name: 'DEPLOY_ENV', defaultValue: 'devlopment', description: 'Select the target environment')
+ environment {
+        IMAGE_NAME = 'sam1002/springrestxapi'
+        PORT_MAPPING = '8081:7000'  // hostPort:containerPort
+    }
+
+ 
+ 
+  parameters {
+   string(name: 'DEPLOY_ENV', defaultValue: 'development', description: 'Select the target environment')
+   string(name: 'APP_VERSION', description: 'Provide tag for the docker image')
 }
 
-stage("checkout"){
-  when {
+stages{
+
+  
+   stage("checkout"){
+    when {
                 // Execute this stage if the ENVIRONMENT parameter is 'development'
                 expression { 
-                     return params.DEPLOY_ENV == 'devlopment' 
+                     return params.DEPLOY_ENV == 'development' 
                 }
           }
-}
      steps {
            sh """
            echo "Checkout done - $PWD"
-           echo "DEPOLYMENT ENV SELECTED - $DEPLOY_ENV"
+           echo "DEPLOY_ENV value $DEPLOY_ENV"
            ls -l
            """
       }
-   }
-   stage("Building the application"){
+   } 
+
+   stage("Check Tools") {
+            steps {
+                sh '''
+                  echo "PATH = $PATH"
+                  which mvn
+                  mvn --version
+                  java -version
+                '''
+            }
+        }
+       
+    stage("Building the application"){
      steps {
          sh """
            echo "========Building Java Application============"
-           mvn clean package
+           mvn clean package -B -DskipTests
            echo "======Building Java Application completed====="
          """      
       }
+    }
+
+   stage("Testing the application"){
+     steps {
+         sh 'echo "========Testing Java Application============"'
+         sh  '/opt/apache-maven-3.9.12/bin/mvn test'
+          sh 'echo "========Completed Tests============"'
+     }  
    }
 
-       
-        
-    
-          
+ stage("Docker Image")
+ {
+   steps {
+          sh """
+           echo "========Building the Docker Image ============"
+           docker build -t $IMAGE_NAME:'$APP_VERSION' .
+           echo "====== Building Image Completed ====="
+         """      
+   } 
+ }
 
 
 } // end of stages
